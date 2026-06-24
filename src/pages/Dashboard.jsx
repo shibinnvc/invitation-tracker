@@ -14,11 +14,12 @@ export default function Dashboard({ onAddMember }) {
       (i) => i.invitationStatus === 'invited_phone' || i.invitationStatus === 'invited_direct'
     ).length;
     const pending = invitees.filter((i) => i.invitationStatus === 'pending').length;
-    const expected = invitees
-      .filter((i) => i.chanceToAttend === 'confirmed' || i.chanceToAttend === 'high')
-      .reduce((sum, i) => sum + (Number(i.guestsCount) || 1), 0);
+    const totalPeople = invitees.reduce(
+      (sum, i) => sum + (Number(i.guestsCount) || 1),
+      0
+    );
 
-    return { total, invited, pending, expected };
+    return { total, invited, pending, totalPeople };
   }, [invitees]);
 
   const categoryStats = useMemo(() => {
@@ -54,7 +55,7 @@ export default function Dashboard({ onAddMember }) {
         <StatCard label="Total Invitees" value={stats.total} icon={Users} color="blue" />
         <StatCard label="Already Invited" value={stats.invited} icon={CheckCircle} color="green" />
         <StatCard label="Pending" value={stats.pending} icon={Clock} color="amber" />
-        <StatCard label="Expected Guests" value={stats.expected} icon={Star} color="purple" />
+        <StatCard label="Total People" value={stats.totalPeople} icon={Star} color="purple" />
       </div>
 
       {/* Charts */}
