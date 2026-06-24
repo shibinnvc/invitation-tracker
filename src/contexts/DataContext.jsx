@@ -12,7 +12,7 @@ import {
   getDoc,
   setDoc,
 } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, authReady } from '../firebase/config';
 
 const DataContext = createContext(null);
 
@@ -23,30 +23,41 @@ export function DataProvider({ children }) {
   const [dbError, setDbError] = useState(null);
 
   useEffect(() => {
-    const unsubCats = onSnapshot(
-      query(collection(db, 'categories'), orderBy('order')),
-      (snap) => {
-        setCategories(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-        setLoading(false);
-      },
-      (err) => {
-        console.error('Firestore categories error:', err);
-        setDbError(err.message);
-        setLoading(false);
-      }
-    );
+    let unsubCats = () => {};
+    let unsubInv = () => {};
+    let cancelled = false;
 
-    const unsubInv = onSnapshot(
-      query(collection(db, 'invitees'), orderBy('createdAt', 'desc')),
-      (snap) => {
-        setInvitees(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-      },
-      (err) => {
-        console.error('Firestore invitees error:', err);
-      }
-    );
+    // Wait for anonymous auth before subscribing, so the listeners carry an
+    // auth token and pass the `request.auth != null` security rule.
+    authReady.then(() => {
+      if (cancelled) return;
+
+      unsubCats = onSnapshot(
+        query(collection(db, 'categories'), orderBy('order')),
+        (snap) => {
+          setCategories(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+          setLoading(false);
+        },
+        (err) => {
+          console.error('Firestore categories error:', err);
+          setDbError(err.message);
+          setLoading(false);
+        }
+      );
+
+      unsubInv = onSnapshot(
+        query(collection(db, 'invitees'), orderBy('createdAt', 'desc')),
+        (snap) => {
+          setInvitees(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        },
+        (err) => {
+          console.error('Firestore invitees error:', err);
+        }
+      );
+    });
 
     return () => {
+      cancelled = true;
       unsubCats();
       unsubInv();
     };
