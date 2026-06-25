@@ -1,10 +1,14 @@
 import { useState, useMemo } from 'react';
-import { Search, UserPlus, ChevronDown, ChevronUp, Pencil, Trash2, Users, Phone, UserCheck, FileDown, StickyNote } from 'lucide-react';
+import { Search, UserPlus, ChevronDown, ChevronUp, Pencil, Trash2, Users, Phone, PhoneCall, MessageCircle, UserCheck, FileDown, StickyNote } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { StatusBadge, ChanceBadge } from '../components/StatusBadge';
 import ExportPdfModal from '../components/ExportPdfModal';
 
 const STATUS_CYCLE = ['pending', 'invited_phone', 'invited_direct'];
+
+// tel: links keep a leading + but drop spaces; WhatsApp's wa.me wants digits only.
+const telHref = (phone) => `tel:${phone.replace(/[^\d+]/g, '')}`;
+const whatsappHref = (phone) => `https://wa.me/${phone.replace(/\D/g, '')}`;
 
 function InviteeRow({ invitee, onEdit, onCycleStatus, onDelete }) {
   return (
@@ -44,6 +48,26 @@ function InviteeRow({ invitee, onEdit, onCycleStatus, onDelete }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
+          {invitee.phone && (
+            <>
+              <a
+                href={telHref(invitee.phone)}
+                title={`Call ${invitee.phone}`}
+                className="p-1.5 rounded-lg hover:bg-sky-50 hover:text-sky-600 text-gray-400 transition-colors"
+              >
+                <PhoneCall className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={whatsappHref(invitee.phone)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`WhatsApp ${invitee.phone}`}
+                className="p-1.5 rounded-lg hover:bg-green-50 hover:text-green-600 text-gray-400 transition-colors"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+              </a>
+            </>
+          )}
           <button
             onClick={() => onEdit(invitee)}
             className="p-1.5 rounded-lg hover:bg-blue-50 hover:text-blue-600 text-gray-400 transition-colors"
