@@ -57,11 +57,12 @@ export default function ExportPdfModal({ invitees, categories, onClose }) {
 
     autoTable(doc, {
       startY: 74,
-      head: [fields.map((f) => f.label)],
-      body: invitees.map((inv) => fields.map((f) => f.get(inv, catMap))),
+      head: [['#', ...fields.map((f) => f.label)]],
+      body: invitees.map((inv, idx) => [idx + 1, ...fields.map((f) => f.get(inv, catMap))]),
       styles: { fontSize: 9, cellPadding: 5 },
       headStyles: { fillColor: [225, 29, 72], textColor: 255 },
       alternateRowStyles: { fillColor: [253, 242, 245] },
+      columnStyles: { 0: { cellWidth: 28, halign: 'right' } },
       margin: { left: 40, right: 40 },
     });
 
