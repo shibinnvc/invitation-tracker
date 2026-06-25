@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { collection, getDocs, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, setDoc, writeBatch } from 'firebase/firestore';
 import { db, authReady } from '../firebase/config';
 
 const DEFAULT_CATEGORIES = [
@@ -24,8 +24,14 @@ export function useSeed() {
 
     async function seed() {
       await authReady; // ensure we have an auth token before reading/writing
-      const snap = await getDocs(collection(db, 'categories'));
-      if (!snap.empty) return;
+
+      // Seed only once ever — tracked by the settings/app doc. Gating on the
+      // categories collection being empty would re-create the defaults every
+      // time the user intentionally deletes them all, which is the bug we are
+      // fixing. Once settings/app exists, the app is considered initialized.
+      const settingsRef = doc(db, 'settings', 'app');
+      const settingsSnap = await getDoc(settingsRef);
+      if (settingsSnap.exists()) return;
 
       // Deterministic IDs make seeding idempotent: even if this runs more than
       // once concurrently, every category maps to the same document instead of
@@ -39,11 +45,8 @@ export function useSeed() {
       }
       await batch.commit();
 
-      // Seed default PIN = 1234
-      const settingsSnap = await getDocs(collection(db, 'settings'));
-      if (settingsSnap.empty) {
-        await setDoc(doc(db, 'settings', 'app'), { pin: '1234' });
-      }
+      // Mark the app as initialized and seed the default PIN = 1234.
+      await setDoc(settingsRef, { pin: '1234', seeded: true });
     }
 
     seed().catch((err) => {
