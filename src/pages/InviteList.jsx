@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, UserPlus, ChevronDown, ChevronUp, Pencil, Trash2, Users, Phone, UserCheck, FileDown } from 'lucide-react';
+import { Search, UserPlus, ChevronDown, ChevronUp, Pencil, Trash2, Users, Phone, UserCheck, FileDown, StickyNote } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { StatusBadge, ChanceBadge } from '../components/StatusBadge';
 import ExportPdfModal from '../components/ExportPdfModal';
@@ -19,7 +19,17 @@ function InviteeRow({ invitee, onEdit, onCycleStatus, onDelete }) {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-800 text-sm break-words">{invitee.name}</p>
+          <p className="font-semibold text-gray-800 text-sm break-words flex items-center gap-1.5">
+            {invitee.name}
+            {invitee.notes && (
+              <span
+                title={invitee.notes}
+                className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 text-amber-600 flex-shrink-0"
+              >
+                <StickyNote className="w-2.5 h-2.5" />
+              </span>
+            )}
+          </p>
           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
             {invitee.subcategoryName && (
               <span className="text-xs text-gray-400">{invitee.subcategoryName} •</span>
