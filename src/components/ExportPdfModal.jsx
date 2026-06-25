@@ -44,7 +44,7 @@ export default function ExportPdfModal({ invitees, categories, onClose }) {
 
     doc.setFontSize(16);
     doc.setTextColor(190, 18, 60);
-    doc.text('Wedding Invite List', 40, 40);
+    doc.text("Sabeeha's Wedding Invite List", 40, 40);
 
     doc.setFontSize(10);
     doc.setTextColor(110);
@@ -87,7 +87,7 @@ export default function ExportPdfModal({ invitees, categories, onClose }) {
       const blob = buildDoc().output('blob');
       const file = new File([blob], 'invite-list.pdf', { type: 'application/pdf' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'Wedding Invite List' });
+        await navigator.share({ files: [file], title: "Sabeeha's Wedding Invite List" });
         onClose();
       } else {
         buildDoc().save('invite-list.pdf');

@@ -37,7 +37,7 @@ export default function LoginPage({ onLogin }) {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Wedding Invitation</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-1">Sabeeha's Wedding Invitation</h1>
         <p className="text-gray-500 text-sm mb-8">Enter PIN to access the tracker</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
